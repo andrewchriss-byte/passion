@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Time Machine: 2023 Spec Simulation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Racing+Sans+One&family=Titillium+Web:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+        :root {
+            --bg-dark: #0f0f12;
+            --panel-bg: rgba(25, 25, 30, 0.8);
+            --f1-red: #e10600;
+            --text-main: #f4f4f4;
+            --text-muted: #888;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 0%, #2a2a35 0%, var(--bg-dark) 60%);
+            color: var(--text-main);
+            font-family: 'Titillium Web', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-family: 'Racing Sans One', sans-serif;
+            font-size: 3rem;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(225, 6, 0, 0.5);
+        }
+
+        h1 span { color: var(--f1-red); }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            background: var(--f1-red);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-family: 'Titillium Web', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(225, 6, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #ff1e16;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(225, 6, 0, 0.5);
+        }
+
+        button:active { transform: translateY(0); }
+
+        .leaderboard {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 50px 4px 2fr 1fr 1fr;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+            animation: slideIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .row:hover { background: rgba(255, 255, 255, 0.05); }
+        .row.header-row {
+            background: rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            animation: none;
+            opacity: 1;
+        }
+
+        .pos { font-family: 'Racing Sans One', sans-serif; font-size: 1.5rem; color: var(--text-muted); }
+        .header-row .pos { font-family: 'Titillium Web', sans-serif; font-size: 0.9rem; }
+        
+        .team-color { width: 4px; height: 30px; border-radius: 2px; }
+        
+        .driver-info { padding-left: 15px; display: flex; flex-direction: column; }
+        .driver-name { font-weight: 700; font-size: 1.2rem; text-transform: uppercase;}
+        .team-name { font-size: 0.85rem; color: var(--text-muted); }
+        
+        .time { font-family: monospace; font-size: 1.1rem; color: #a8b2d1; text-align: right; }
+        .status { font-weight: 700; text-align: right; }
+        .status.dnf { color: var(--f1-red); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>F1 <span>Sim</span></h1>
+        <p class="subtitle">Current Drivers. 2023 Machinery. Real Physics Logic.</p>
+    </header>
+
+    <div class="controls">
+        <button onclick="runSimulation()">Simulate Race</button>
+    </div>
+
+    <div class="leaderboard" id="board">
+        </div>
+
+    <script>
+        // 2023 Car Performance Data (Pace = Base speed, Reliability = Chance to DNF)
+        const cars2023 = {
+            "Red Bull (RB19)": { pace: 100, reliability: 98, color: '#3671C6' },
+            "Mercedes (W14)": { pace: 88, reliability: 95, color: '#27F4D2' },
+            "Ferrari (SF-23)": { pace: 93, reliability: 82, color: '#E8002D' },
+            "McLaren (MCL60)": { pace: 91, reliability: 90, color: '#FF8000' },
+            "Aston Martin (AMR23)":{ pace: 89, reliability: 93, color: '#229971' }
+        };
+
+        // Current Drivers with estimated modern stats
+        // Skill = Raw pace, Consistency = Avoiding mistakes
+        const currentGrid = [
+            { name: "Max Verstappen", team: "Red Bull (RB19)", skill: 99, consistency: 98 },
+            { name: "Charles Leclerc", team: "Ferrari (SF-23)", skill: 96, consistency: 88 },
+            { name: "Lewis Hamilton", team: "Ferrari (SF-23)", skill: 95, consistency: 92 }, // Current timeline pairing
+            { name: "Lando Norris", team: "McLaren (MCL60)", skill: 94, consistency: 90 },
+            { name: "Oscar Piastri", team: "McLaren (MCL60)", skill: 92, consistency: 93 },
+            { name: "George Russell", team: "Mercedes (W14)", skill: 91, consistency: 87 },
+            { name: "Fernando Alonso", team: "Aston Martin (AMR23)", skill: 93, consistency: 90 },
+            { name: "Sergio Perez", team: "Red Bull (RB19)", skill: 85, consistency: 75 },
+            { name: "Lance Stroll", team: "Aston Martin (AMR23)", skill: 80, consistency: 78 },
+            { name: "Andrea K. Antonelli", team: "Mercedes (W14)", skill: 88, consistency: 80 } // Rookie metric
+        ];
+
+        const board = document.getElementById('board');
+
+        function generateBaseBoard() {
+            board.innerHTML = `
+                <div class="row header-row">
+                    <div class="pos">POS</div>
+                    <div></div>
+                    <div class="driver-info">DRIVER / TEAM</div>
+                    <div class="status">STATUS</div>
+                    <div class="time">GAP</div>
+                </div>
+            `;
+            
+            // Render initial unsorted list
+            currentGrid.forEach((driver, index) => {
+                const color = cars2023[driver.team].color;
+                board.innerHTML += `
+                    <div class="row" style="animation-delay: ${index * 0.05}s">
+                        <div class="pos">-</div>
+                        <div class="team-color" style="background-color: ${color}"></div>
+                        <div class="driver-info">
+                            <span class="driver-name">${driver.name}</span>
+                            <span class="team-name">${driver.team}</span>
+                        </div>
+                        <div class="status">GARAGE</div>
+                        <div class="time">0.000s</div>
+                    </div>
+                `;
+            });
+        }
+
+        function runSimulation() {
+            let results = [];
+
+            currentGrid.forEach(driver => {
+                const car = cars2023[driver.team];
+                
+                // Calculate Reliability / DNF check
+                // If a random roll is higher than car's reliability + driver consistency factor, they DNF.
+                const dnfRoll = Math.random() * 100;
+                const dnfThreshold = 100 - (car.reliability * 0.7 + driver.consistency * 0.3);
+                
+                let isDnf = dnfRoll < dnfThreshold;
+                
+                // Calculate Race Time (Lower is better)
+                // Base time minus car pace and driver skill, plus random variance based on (lack of) consistency
+                const baseTime = 5000; 
+                const carFactor = car.pace * 2.5;
+                const driverFactor = driver.skill * 1.5;
+                const mistakeFactor = Math.random() * (100 - driver.consistency) * 3;
+                
+                let finalTime = baseTime - carFactor - driverFactor + mistakeFactor;
+
+                results.push({
+                    ...driver,
+                    carColor: car.color,
+                    time: finalTime,
+                    isDnf: isDnf
+                });
+            });
+
+            // Sort results: Finishers first (by lowest time), then DNFs at the bottom
+            results.sort((a, b) => {
+                if (a.isDnf && !b.isDnf) return 1;
+                if (!a.isDnf && b.isDnf) return -1;
+                return a.time - b.time;
+            });
+
+            renderResults(results);
+        }
+
+        function renderResults(results) {
+            board.innerHTML = `
+                <div class="row header-row">
+                    <div class="pos">POS</div>
+                    <div></div>
+                    <div class="driver-info">DRIVER / TEAM</div>
+                    <div class="status">STATUS</div>
+                    <div class="time">GAP</div>
+                </div>
+            `;
+
+            let winningTime = results[0].time;
+
+            results.forEach((result, index) => {
+                let displayPos = result.isDnf ? 'OUT' : index + 1;
+                let displayStatus = result.isDnf ? '<span class="status dnf">DNF</span>' : 'FINISHED';
+                
+                // Calculate time gap to leader
+                let displayGap = "";
+                if (result.isDnf) {
+                    displayGap = "N/A";
+                } else if (index === 0) {
+                    displayGap = "Leader";
+                } else {
+                    let gap = (result.time - winningTime).toFixed(3);
+                    displayGap = `+${gap}s`;
+                }
+
+                board.innerHTML += `
+                    <div class="row" style="animation-delay: ${index * 0.08}s">
+                        <div class="pos">${displayPos}</div>
+                        <div class="team-color" style="background-color: ${result.carColor}"></div>
+                        <div class="driver-info">
+                            <span class="driver-name">${result.name}</span>
+                            <span class="team-name">${result.team}</span>
+                        </div>
+                        <div class="status">${displayStatus}</div>
+                        <div class="time">${displayGap}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize board on load
+        window.onload = generateBaseBoard;
+    </script>
+</body>
+</html>
