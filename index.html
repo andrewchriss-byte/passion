@@ -44,7 +44,6 @@
             overflow: hidden;
         }
 
-        /* Side Panels */
         .panel {
             background: var(--panel-bg);
             border-radius: 10px;
@@ -53,7 +52,7 @@
             flex-direction: column;
             overflow: hidden;
         }
-        .schedule-panel { width: 300px; flex-shrink: 0; }
+        .schedule-panel { width: 330px; flex-shrink: 0; }
         .leaderboard-panel { width: 350px; flex-shrink: 0; }
 
         .panel-header {
@@ -73,7 +72,6 @@
         .scroll-list::-webkit-scrollbar { width: 6px; }
         .scroll-list::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
 
-        /* Schedule Items */
         .race-item {
             padding: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -84,8 +82,8 @@
         .race-rnd { font-size: 0.75rem; color: var(--f1-red); font-weight: bold; }
         .race-name { font-size: 1rem; font-weight: bold; }
         .race-loc { font-size: 0.85rem; color: var(--text-muted); }
+        .race-date { font-size: 0.75rem; color: #aaa; margin-top: 3px; font-style: italic;}
 
-        /* Leaderboard / Key Items */
         .lb-row {
             display: flex;
             align-items: center;
@@ -100,7 +98,6 @@
         .lb-name { flex: 1; line-height: 1.2; }
         .lb-status { font-size: 0.85rem; font-weight: bold; color: var(--f1-red); text-align: right; }
 
-        /* Track Visualizer */
         .visualizer-panel {
             flex: 1;
             position: relative;
@@ -140,11 +137,7 @@
         button:hover { background: #ff1e15; transform: translateY(-2px); }
         button:disabled { background: #444; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        svg {
-            width: 100%;
-            height: 100%;
-            max-height: 700px;
-        }
+        svg { width: 100%; height: 100%; max-height: 700px; }
 
         .track-border {
             fill: none;
@@ -204,59 +197,57 @@
     </div>
 
     <script>
-        // Official 2026 F1 Schedule Dates & Locations
+        // Updated Schedule exactly matching the user request
         const schedule2026 = [
-            { rnd: 1, name: "Australian Grand Prix", loc: "Melbourne, Australia", layout: "street" },
-            { rnd: 2, name: "Chinese Grand Prix", loc: "Shanghai, China", layout: "classic" },
-            { rnd: 3, name: "Japanese Grand Prix", loc: "Suzuka, Japan", layout: "classic" },
-            { rnd: 4, name: "Bahrain Grand Prix", loc: "Sakhir, Bahrain", layout: "classic" },
-            { rnd: 5, name: "Saudi Arabian Grand Prix", loc: "Jeddah, Saudi Arabia", layout: "speed" },
-            { rnd: 6, name: "Miami Grand Prix", loc: "Miami, USA", layout: "street" },
-            { rnd: 7, name: "Canadian Grand Prix", loc: "Montreal, Canada", layout: "classic" },
-            { rnd: 8, name: "Monaco Grand Prix", loc: "Monte Carlo, Monaco", layout: "street" },
-            { rnd: 9, name: "Spanish Grand Prix", loc: "Barcelona, Spain", layout: "classic" },
-            { rnd: 10, name: "Austrian Grand Prix", loc: "Spielberg, Austria", layout: "speed" },
-            { rnd: 11, name: "British Grand Prix", loc: "Silverstone, UK", layout: "classic" },
-            { rnd: 12, name: "Belgian Grand Prix", loc: "Spa-Francorchamps, Belgium", layout: "classic" },
-            { rnd: 13, name: "Hungarian Grand Prix", loc: "Budapest, Hungary", layout: "classic" },
-            { rnd: 14, name: "Dutch Grand Prix", loc: "Zandvoort, Netherlands", layout: "classic" },
-            { rnd: 15, name: "Italian Grand Prix", loc: "Monza, Italy", layout: "speed" },
-            { rnd: 16, name: "Madrid Grand Prix", loc: "Madrid, Spain", layout: "street" },
-            { rnd: 17, name: "Azerbaijan Grand Prix", loc: "Baku, Azerbaijan", layout: "street" },
-            { rnd: 18, name: "Singapore Grand Prix", loc: "Marina Bay, Singapore", layout: "street" },
-            { rnd: 19, name: "United States Grand Prix", loc: "Austin, USA", layout: "classic" },
-            { rnd: 20, name: "Mexico City Grand Prix", loc: "Mexico City, Mexico", layout: "classic" },
-            { rnd: 21, name: "São Paulo Grand Prix", loc: "Interlagos, Brazil", layout: "classic" },
-            { rnd: 22, name: "Las Vegas Grand Prix", loc: "Las Vegas, USA", layout: "speed" },
-            { rnd: 23, name: "Qatar Grand Prix", loc: "Lusail, Qatar", layout: "classic" },
-            { rnd: 24, name: "Abu Dhabi Grand Prix", loc: "Yas Marina, UAE", layout: "classic" }
+            { rnd: 1, name: "Australia", loc: "Albert Park Circuit, Melbourne", date: "Mar 6-8", layout: "street" },
+            { rnd: 2, name: "China", loc: "Shanghai International Circuit", date: "Mar 13-15", layout: "classic" },
+            { rnd: 3, name: "Japan", loc: "Suzuka International Racing Course", date: "Mar 27-29", layout: "classic" },
+            { rnd: 4, name: "Bahrain", loc: "Bahrain International Circuit, Sakhir", date: "Apr 10-12", layout: "classic" },
+            { rnd: 5, name: "Saudi Arabia", loc: "Jeddah Corniche Circuit", date: "Apr 17-19", layout: "speed" },
+            { rnd: 6, name: "Miami", loc: "Miami International Autodrome", date: "May 1-3", layout: "street" },
+            { rnd: 7, name: "Canada", loc: "Circuit Gilles-Villeneuve, Montreal", date: "May 22-24", layout: "classic" },
+            { rnd: 8, name: "Monaco", loc: "Circuit de Monaco, Monte Carlo", date: "Jun 5-7", layout: "street" },
+            { rnd: 9, name: "Spain", loc: "Circuit de Barcelona-Catalunya", date: "Jun 12-14", layout: "classic" },
+            { rnd: 10, name: "Austria", loc: "Red Bull Ring, Spielberg", date: "Jun 26-28", layout: "speed" },
+            { rnd: 11, name: "Great Britain", loc: "Silverstone Circuit", date: "Jul 3-5", layout: "classic" },
+            { rnd: 12, name: "Belgium", loc: "Circuit de Spa-Francorchamps", date: "TBD", layout: "classic" },
+            { rnd: 13, name: "Hungary", loc: "Hungaroring, Budapest", date: "TBD", layout: "classic" },
+            { rnd: 14, name: "Netherlands", loc: "Circuit Zandvoort", date: "TBD", layout: "classic" },
+            { rnd: 15, name: "Italy", loc: "Autodromo Nazionale Monza", date: "TBD", layout: "speed" },
+            { rnd: 16, name: "Spain (Madrid)", loc: "Circuit de Madrid (New Street Circuit)", date: "TBD", layout: "street" },
+            { rnd: 17, name: "Azerbaijan", loc: "Baku City Circuit", date: "TBD", layout: "street" },
+            { rnd: 18, name: "Singapore", loc: "Marina Bay Street Circuit", date: "TBD", layout: "street" },
+            { rnd: 19, name: "USA", loc: "Circuit of the Americas", date: "TBD", layout: "classic" },
+            { rnd: 20, name: "Mexico", loc: "Autódromo Hermanos Rodríguez", date: "TBD", layout: "classic" },
+            { rnd: 21, name: "Brazil", loc: "Interlagos Circuit", date: "TBD", layout: "classic" },
+            { rnd: 22, name: "Las Vegas", loc: "Las Vegas Strip Street Circuit", date: "TBD", layout: "speed" },
+            { rnd: 23, name: "Qatar", loc: "Lusail International Circuit", date: "TBD", layout: "classic" },
+            { rnd: 24, name: "Abu Dhabi", loc: "Yas Marina Circuit", date: "TBD", layout: "classic" }
         ];
 
-        // 2026 Grid Data (Teams, Colors, Drivers)
         const f1Drivers = [
-            { id: "VER", name: "Max Verstappen", team: "Red Bull", color: "#3671C6", speed: 4.8 },
-            { id: "PER", name: "Sergio Perez", team: "Red Bull", color: "#3671C6", speed: 4.5 },
-            { id: "HAM", name: "Lewis Hamilton", team: "Ferrari", color: "#E8002D", speed: 4.7 },
-            { id: "LEC", name: "Charles Leclerc", team: "Ferrari", color: "#E8002D", speed: 4.75 },
-            { id: "NOR", name: "Lando Norris", team: "McLaren", color: "#FF8000", speed: 4.75 },
-            { id: "PIA", name: "Oscar Piastri", team: "McLaren", color: "#FF8000", speed: 4.65 },
-            { id: "RUS", name: "George Russell", team: "Mercedes", color: "#27F4D2", speed: 4.6 },
-            { id: "ANT", name: "Kimi Antonelli", team: "Mercedes", color: "#27F4D2", speed: 4.5 },
-            { id: "ALO", name: "Fernando Alonso", team: "Aston Martin", color: "#229971", speed: 4.4 },
-            { id: "STR", name: "Lance Stroll", team: "Aston Martin", color: "#229971", speed: 4.2 },
-            { id: "SAI", name: "Carlos Sainz", team: "Williams", color: "#005AFF", speed: 4.4 },
-            { id: "ALB", name: "Alex Albon", team: "Williams", color: "#005AFF", speed: 4.3 },
-            { id: "GAS", name: "Pierre Gasly", team: "Alpine", color: "#FF87BC", speed: 4.2 },
-            { id: "DOO", name: "Jack Doohan", team: "Alpine", color: "#FF87BC", speed: 4.1 },
-            { id: "TSU", name: "Yuki Tsunoda", team: "RB", color: "#6692FF", speed: 4.3 },
-            { id: "HAD", name: "Isack Hadjar", team: "RB", color: "#6692FF", speed: 4.1 },
-            { id: "HUL", name: "Nico Hulkenberg", team: "Sauber", color: "#00E701", speed: 4.2 },
-            { id: "BOR", name: "Gabriel Bortoleto", team: "Sauber", color: "#00E701", speed: 4.1 },
-            { id: "OCO", name: "Esteban Ocon", team: "Haas", color: "#FFFFFF", speed: 4.2 },
-            { id: "BEA", name: "Oliver Bearman", team: "Haas", color: "#FFFFFF", speed: 4.1 }
+            { id: "VER", name: "Max Verstappen", team: "Red Bull", color: "#3671C6", baseSpeed: 3.8 },
+            { id: "PER", name: "Sergio Perez", team: "Red Bull", color: "#3671C6", baseSpeed: 3.5 },
+            { id: "HAM", name: "Lewis Hamilton", team: "Ferrari", color: "#E8002D", baseSpeed: 3.7 },
+            { id: "LEC", name: "Charles Leclerc", team: "Ferrari", color: "#E8002D", baseSpeed: 3.75 },
+            { id: "NOR", name: "Lando Norris", team: "McLaren", color: "#FF8000", baseSpeed: 3.75 },
+            { id: "PIA", name: "Oscar Piastri", team: "McLaren", color: "#FF8000", baseSpeed: 3.65 },
+            { id: "RUS", name: "George Russell", team: "Mercedes", color: "#27F4D2", baseSpeed: 3.6 },
+            { id: "ANT", name: "Kimi Antonelli", team: "Mercedes", color: "#27F4D2", baseSpeed: 3.5 },
+            { id: "ALO", name: "Fernando Alonso", team: "Aston Martin", color: "#229971", baseSpeed: 3.4 },
+            { id: "STR", name: "Lance Stroll", team: "Aston Martin", color: "#229971", baseSpeed: 3.2 },
+            { id: "SAI", name: "Carlos Sainz", team: "Williams", color: "#005AFF", baseSpeed: 3.4 },
+            { id: "ALB", name: "Alex Albon", team: "Williams", color: "#005AFF", baseSpeed: 3.3 },
+            { id: "GAS", name: "Pierre Gasly", team: "Alpine", color: "#FF87BC", baseSpeed: 3.2 },
+            { id: "DOO", name: "Jack Doohan", team: "Alpine", color: "#FF87BC", baseSpeed: 3.1 },
+            { id: "TSU", name: "Yuki Tsunoda", team: "RB", color: "#6692FF", baseSpeed: 3.3 },
+            { id: "HAD", name: "Isack Hadjar", team: "RB", color: "#6692FF", baseSpeed: 3.1 },
+            { id: "HUL", name: "Nico Hulkenberg", team: "Sauber", color: "#00E701", baseSpeed: 3.2 },
+            { id: "BOR", name: "Gabriel Bortoleto", team: "Sauber", color: "#00E701", baseSpeed: 3.1 },
+            { id: "OCO", name: "Esteban Ocon", team: "Haas", color: "#FFFFFF", baseSpeed: 3.2 },
+            { id: "BEA", name: "Oliver Bearman", team: "Haas", color: "#FFFFFF", baseSpeed: 3.1 }
         ];
 
-        // Scaled track shapes to fit perfectly inside the SVG Box
         const trackLayouts = {
             classic: "M 300 150 C 600 50, 900 200, 850 400 C 800 600, 600 650, 450 550 C 300 450, 200 600, 150 450 C 100 300, 50 150, 300 150 Z",
             street: "M 200 200 L 800 200 L 800 500 L 600 500 L 600 350 L 400 350 L 400 500 L 200 500 Z",
@@ -270,7 +261,6 @@
         let finishCounter = 0;
         let currentPathLength = 0;
 
-        // Initialize App
         window.onload = () => {
             const list = document.getElementById('schedule-list');
             schedule2026.forEach(race => {
@@ -280,27 +270,25 @@
                     <div class="race-rnd">ROUND ${race.rnd}</div>
                     <div class="race-name">${race.name}</div>
                     <div class="race-loc">${race.loc}</div>
+                    <div class="race-date">${race.date}</div>
                 `;
                 el.onclick = () => loadTrack(race, el);
                 list.appendChild(el);
             });
-            loadTrack(schedule2026[0], list.firstChild); // Load first race
+            loadTrack(schedule2026[0], list.firstChild);
         };
 
         function loadTrack(race, element) {
-            // UI Update
             document.querySelectorAll('.race-item').forEach(el => el.classList.remove('active'));
             if(element) element.classList.add('active');
             document.getElementById('current-track-name').innerText = race.name;
             document.getElementById('current-track-loc').innerText = race.loc;
 
-            // Reset Race State
             isRacing = false;
             cancelAnimationFrame(animationId);
             document.getElementById('sim-btn').disabled = false;
             document.getElementById('sim-btn').innerText = "🏁 Simulate Race (3 Laps)";
 
-            // Update SVG Track Path
             const newPath = trackLayouts[race.layout];
             const trackPath = document.getElementById('center-line');
             trackPath.setAttribute('d', newPath);
@@ -309,25 +297,22 @@
 
             spawnCars();
             updateLeaderboard();
-            animate(); // Start idle grid rendering
+            animate(); 
         }
 
         function spawnCars() {
             const layer = document.getElementById('cars-layer');
-            layer.innerHTML = ''; // Clear existing
+            layer.innerHTML = ''; 
             
             carsData = f1Drivers.map((driver, index) => {
-                // Create SVG Group for the car & its text label
                 const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 
-                // Colored Circle
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 circle.setAttribute("r", "7");
                 circle.setAttribute("fill", driver.color);
                 circle.setAttribute("stroke", "#fff");
                 circle.setAttribute("stroke-width", "1.5");
                 
-                // Driver Label
                 const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                 text.textContent = driver.id;
                 text.setAttribute("x", "0");
@@ -345,7 +330,8 @@
                 return {
                     ...driver,
                     element: g,
-                    distance: -index * 30, // Stagger them on the grid behind the start line
+                    distance: -index * 30, 
+                    currentSpeedMultiplier: 1.0, // Used for the braking logic
                     lap: 0,
                     finished: false,
                     finishPosition: null
@@ -362,9 +348,9 @@
             btn.disabled = true;
             btn.innerText = "🏎️ RACING...";
 
-            // Reset logic
             carsData.forEach((car, index) => {
                 car.distance = -index * 30;
+                car.currentSpeedMultiplier = 1.0;
                 car.lap = 0;
                 car.finished = false;
                 car.finishPosition = null;
@@ -378,10 +364,33 @@
             carsData.forEach(car => {
                 if (!car.finished && isRacing) {
                     allFinished = false;
-                    // Add slight RNG variance to allow for overtakes
-                    let speedVariance = (Math.random() - 0.45) * 2.0; 
-                    car.distance += car.speed + speedVariance;
+
+                    // --- NEW PHYSICS: BRAKING AND ACCELERATION ---
+                    // Look 5px and 25px ahead of the car to see if a corner is coming
+                    let distCheck = car.distance < 0 ? 0 : car.distance;
+                    const pCurrent = path.getPointAtLength(distCheck % currentPathLength);
+                    const pAhead1 = path.getPointAtLength((distCheck + 5) % currentPathLength);
+                    const pAhead2 = path.getPointAtLength((distCheck + 25) % currentPathLength);
+
+                    // Calculate the angles of the track ahead
+                    const angle1 = Math.atan2(pAhead1.y - pCurrent.y, pAhead1.x - pCurrent.x);
+                    const angle2 = Math.atan2(pAhead2.y - pAhead1.y, pAhead2.x - pAhead1.x);
+
+                    // Calculate how much the track bends
+                    let angleDiff = Math.abs(angle1 - angle2);
+                    if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+
+                    // Set target speed based on track straightness (Straights = 2.0x, Sharp Corners = 0.4x)
+                    let targetMultiplier = Math.max(0.4, 2.0 - (angleDiff * 4));
+
+                    // Smoothly transition the car's speed to simulate braking or hitting the throttle
+                    car.currentSpeedMultiplier += (targetMultiplier - car.currentSpeedMultiplier) * 0.1;
+
+                    // Apply the speed (Base skill + braking multiplier + slight overtaking RNG)
+                    let speedVariance = (Math.random() - 0.45) * 1.0; 
+                    car.distance += (car.baseSpeed + speedVariance) * car.currentSpeedMultiplier;
                     
+                    // Lap counting logic
                     let lapsCompleted = Math.floor(car.distance / currentPathLength);
                     if (lapsCompleted >= 3) {
                         car.finished = true;
@@ -390,18 +399,16 @@
                         car.lap = lapsCompleted;
                     }
                 } else if (!car.finished && !isRacing) {
-                    allFinished = false; // Grid state
+                    allFinished = false; 
                 }
 
-                // Render math: This exactly pins the SVG dot to the path coordinates
+                // Render math
                 let renderDist;
                 if (car.distance < 0) {
-                    // Wrap backward mathematically to line them up before the start line
                     renderDist = currentPathLength + (car.distance % currentPathLength);
                 } else if (car.finished) {
-                    // Slow them down on a cool down lap once they cross the finish
                     renderDist = car.distance % currentPathLength;
-                    car.distance += 1.0; 
+                    car.distance += 1.0; // Cool down lap speed
                 } else {
                     renderDist = car.distance % currentPathLength;
                 }
@@ -410,16 +417,13 @@
                 car.element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
             });
 
-            // Throttle UI Updates so we don't lag the browser
-            if (frameCount % 10 === 0 && isRacing) {
-                updateLeaderboard();
-            }
+            if (frameCount % 10 === 0 && isRacing) updateLeaderboard();
             frameCount++;
 
             if (allFinished && isRacing) {
                 isRacing = false;
                 document.getElementById('sim-btn').innerText = "🏁 RACE FINISHED";
-                updateLeaderboard(); // Final definitive order
+                updateLeaderboard(); 
             }
 
             animationId = requestAnimationFrame(animate);
@@ -428,7 +432,6 @@
         function updateLeaderboard() {
             const list = document.getElementById('leaderboard-list');
             
-            // Sort Array: Finished drivers lock at the top by position. Racing drivers ordered by distance.
             let sortedCars = [...carsData].sort((a, b) => {
                 if (a.finished && b.finished) return a.finishPosition - b.finishPosition;
                 if (a.finished) return -1;
