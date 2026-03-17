@@ -31,7 +31,7 @@
         header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
         h1 {
             font-family: 'Racing Sans One', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin: 0;
             text-transform: uppercase;
         }
@@ -44,9 +44,8 @@
             overflow: hidden;
         }
 
-        /* Schedule Panel */
-        .schedule-panel {
-            width: 300px;
+        /* Side Panels */
+        .panel {
             background: var(--panel-bg);
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -54,59 +53,103 @@
             flex-direction: column;
             overflow: hidden;
         }
+        .schedule-panel { width: 300px; flex-shrink: 0; }
+        .leaderboard-panel { width: 350px; flex-shrink: 0; }
 
         .panel-header {
             background: var(--f1-red);
-            padding: 15px;
+            padding: 12px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-align: center;
         }
 
-        .schedule-list {
+        .scroll-list {
             flex: 1;
             overflow-y: auto;
             padding: 10px;
         }
+        .scroll-list::-webkit-scrollbar { width: 6px; }
+        .scroll-list::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
 
-        .schedule-list::-webkit-scrollbar { width: 6px; }
-        .schedule-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
-
+        /* Schedule Items */
         .race-item {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             cursor: pointer;
             transition: 0.2s;
         }
-        .race-item:hover, .race-item.active { background: rgba(225, 6, 0, 0.2); }
-        .race-rnd { font-size: 0.8rem; color: var(--f1-red); font-weight: bold; }
-        .race-name { font-size: 1.1rem; font-weight: bold; }
-        .race-loc { font-size: 0.9rem; color: var(--text-muted); }
+        .race-item:hover, .race-item.active { background: rgba(225, 6, 0, 0.2); border-left: 4px solid var(--f1-red); }
+        .race-rnd { font-size: 0.75rem; color: var(--f1-red); font-weight: bold; }
+        .race-name { font-size: 1rem; font-weight: bold; }
+        .race-loc { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Leaderboard / Key Items */
+        .lb-row {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 4px;
+            border-radius: 4px;
+        }
+        .lb-pos { width: 30px; font-weight: bold; font-family: 'Racing Sans One', sans-serif; color: var(--text-muted); }
+        .lb-color { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #fff; margin-right: 12px; }
+        .lb-name { flex: 1; line-height: 1.2; }
+        .lb-status { font-size: 0.85rem; font-weight: bold; color: var(--f1-red); text-align: right; }
 
         /* Track Visualizer */
         .visualizer-panel {
             flex: 1;
-            background: var(--panel-bg);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
+
+        .track-info-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            z-index: 10;
+        }
+
+        button {
+            background: var(--f1-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: 'Titillium Web', sans-serif;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.4);
+            transition: 0.2s;
+        }
+        button:hover { background: #ff1e15; transform: translateY(-2px); }
+        button:disabled { background: #444; cursor: not-allowed; box-shadow: none; transform: none; }
 
         svg {
-            width: 80%;
-            height: 80%;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+            width: 100%;
+            height: 100%;
+            max-height: 700px;
         }
 
-        .track-path {
+        .track-border {
             fill: none;
-            stroke: #333;
-            stroke-width: 15;
+            stroke: #222;
+            stroke-width: 25;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
@@ -115,74 +158,70 @@
             fill: none;
             stroke: #fff;
             stroke-width: 2;
-            stroke-dasharray: 5, 5;
+            stroke-dasharray: 6, 6;
         }
 
-        .car {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px currentColor;
-            transition: box-shadow 0.2s;
-            z-index: 10;
-        }
-
-        #track-info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
+        @media (max-width: 1200px) {
+            .dashboard { flex-direction: column; overflow-y: auto; }
+            .schedule-panel, .leaderboard-panel { width: 100%; height: 300px; }
+            .visualizer-panel { height: 500px; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>F1 <span>2026</span> Tracker</h1>
+        <h1>F1 <span>2026</span> Live Tracker & Simulator</h1>
     </header>
 
     <div class="dashboard">
-        <div class="schedule-panel">
+        <div class="panel schedule-panel">
             <div class="panel-header">2026 Calendar</div>
-            <div class="schedule-list" id="schedule-list">
-                </div>
+            <div class="scroll-list" id="schedule-list"></div>
         </div>
 
-        <div class="visualizer-panel">
-            <div id="track-info">
-                <h2 id="current-track-name" style="margin: 0; color: var(--f1-red);">Select a Race</h2>
+        <div class="panel visualizer-panel">
+            <div class="track-info-bar">
+                <h2 id="current-track-name" style="margin: 0; font-family: 'Racing Sans One'; letter-spacing: 1px;">Select a Race</h2>
                 <p id="current-track-loc" style="margin: 5px 0 0 0; color: var(--text-muted);">---</p>
             </div>
             
-            <svg viewBox="0 0 800 600" id="track-svg">
-                <path id="main-track" class="track-path" d="M 200 150 C 400 100, 600 150, 650 300 C 700 450, 500 500, 400 450 C 300 400, 200 500, 150 400 C 100 300, 50 200, 200 150 Z" />
-                <path id="center-line" class="track-centerline" d="M 200 150 C 400 100, 600 150, 650 300 C 700 450, 500 500, 400 450 C 300 400, 200 500, 150 400 C 100 300, 50 200, 200 150 Z" />
+            <svg viewBox="0 0 1000 700" id="track-svg">
+                <path id="track-border" class="track-border" />
+                <path id="center-line" class="track-centerline" />
+                <g id="cars-layer"></g>
             </svg>
             
-            <div id="cars-container"></div>
+            <div class="controls">
+                <button id="sim-btn" onclick="startRace()">🏁 Simulate Race (3 Laps)</button>
+            </div>
+        </div>
+
+        <div class="panel leaderboard-panel">
+            <div class="panel-header">Live Leaderboard & Key</div>
+            <div class="scroll-list" id="leaderboard-list"></div>
         </div>
     </div>
 
     <script>
-        // Representative 2026 Schedule
+        // Official 2026 F1 Schedule Dates & Locations
         const schedule2026 = [
-            { rnd: 1, name: "Bahrain Grand Prix", loc: "Sakhir, Bahrain", layout: "classic" },
-            { rnd: 2, name: "Saudi Arabian Grand Prix", loc: "Jeddah, Saudi Arabia", layout: "street" },
-            { rnd: 3, name: "Australian Grand Prix", loc: "Melbourne, Australia", layout: "street" },
-            { rnd: 4, name: "Japanese Grand Prix", loc: "Suzuka, Japan", layout: "classic" },
-            { rnd: 5, name: "Chinese Grand Prix", loc: "Shanghai, China", layout: "classic" },
+            { rnd: 1, name: "Australian Grand Prix", loc: "Melbourne, Australia", layout: "street" },
+            { rnd: 2, name: "Chinese Grand Prix", loc: "Shanghai, China", layout: "classic" },
+            { rnd: 3, name: "Japanese Grand Prix", loc: "Suzuka, Japan", layout: "classic" },
+            { rnd: 4, name: "Bahrain Grand Prix", loc: "Sakhir, Bahrain", layout: "classic" },
+            { rnd: 5, name: "Saudi Arabian Grand Prix", loc: "Jeddah, Saudi Arabia", layout: "speed" },
             { rnd: 6, name: "Miami Grand Prix", loc: "Miami, USA", layout: "street" },
-            { rnd: 7, name: "Emilia Romagna Grand Prix", loc: "Imola, Italy", layout: "classic" },
+            { rnd: 7, name: "Canadian Grand Prix", loc: "Montreal, Canada", layout: "classic" },
             { rnd: 8, name: "Monaco Grand Prix", loc: "Monte Carlo, Monaco", layout: "street" },
-            { rnd: 9, name: "Spanish Grand Prix", loc: "Madrid, Spain (NEW)", layout: "street" },
-            { rnd: 10, name: "Canadian Grand Prix", loc: "Montreal, Canada", layout: "classic" },
-            { rnd: 11, name: "Austrian Grand Prix", loc: "Spielberg, Austria", layout: "speed" },
-            { rnd: 12, name: "British Grand Prix", loc: "Silverstone, UK", layout: "classic" },
-            { rnd: 13, name: "Belgian Grand Prix", loc: "Spa-Francorchamps, Belgium", layout: "classic" },
-            { rnd: 14, name: "Hungarian Grand Prix", loc: "Budapest, Hungary", layout: "classic" },
-            { rnd: 15, name: "Dutch Grand Prix", loc: "Zandvoort, Netherlands", layout: "classic" },
-            { rnd: 16, name: "Italian Grand Prix", loc: "Monza, Italy", layout: "speed" },
+            { rnd: 9, name: "Spanish Grand Prix", loc: "Barcelona, Spain", layout: "classic" },
+            { rnd: 10, name: "Austrian Grand Prix", loc: "Spielberg, Austria", layout: "speed" },
+            { rnd: 11, name: "British Grand Prix", loc: "Silverstone, UK", layout: "classic" },
+            { rnd: 12, name: "Belgian Grand Prix", loc: "Spa-Francorchamps, Belgium", layout: "classic" },
+            { rnd: 13, name: "Hungarian Grand Prix", loc: "Budapest, Hungary", layout: "classic" },
+            { rnd: 14, name: "Dutch Grand Prix", loc: "Zandvoort, Netherlands", layout: "classic" },
+            { rnd: 15, name: "Italian Grand Prix", loc: "Monza, Italy", layout: "speed" },
+            { rnd: 16, name: "Madrid Grand Prix", loc: "Madrid, Spain", layout: "street" },
             { rnd: 17, name: "Azerbaijan Grand Prix", loc: "Baku, Azerbaijan", layout: "street" },
             { rnd: 18, name: "Singapore Grand Prix", loc: "Marina Bay, Singapore", layout: "street" },
             { rnd: 19, name: "United States Grand Prix", loc: "Austin, USA", layout: "classic" },
@@ -193,27 +232,48 @@
             { rnd: 24, name: "Abu Dhabi Grand Prix", loc: "Yas Marina, UAE", layout: "classic" }
         ];
 
-        // Simplified SVG Path strings for different track types
-        const trackLayouts = {
-            classic: "M 200 150 C 400 100, 600 150, 650 300 C 700 450, 500 500, 400 450 C 300 400, 200 500, 150 400 C 100 300, 50 200, 200 150 Z",
-            street: "M 150 150 L 650 150 L 650 300 L 450 300 L 450 450 L 150 450 Z",
-            speed: "M 200 200 Q 400 50 600 200 Q 750 350 600 400 Q 400 500 200 400 Q 50 250 200 200 Z"
-        };
-
-        const teams = [
-            { name: 'Red Bull', color: '#3671C6', speed: 2.5 },
-            { name: 'Ferrari', color: '#E8002D', speed: 2.45 },
-            { name: 'McLaren', color: '#FF8000', speed: 2.4 },
-            { name: 'Mercedes', color: '#27F4D2', speed: 2.35 },
-            { name: 'Aston Martin', color: '#229971', speed: 2.2 }
+        // 2026 Grid Data (Teams, Colors, Drivers)
+        const f1Drivers = [
+            { id: "VER", name: "Max Verstappen", team: "Red Bull", color: "#3671C6", speed: 4.8 },
+            { id: "PER", name: "Sergio Perez", team: "Red Bull", color: "#3671C6", speed: 4.5 },
+            { id: "HAM", name: "Lewis Hamilton", team: "Ferrari", color: "#E8002D", speed: 4.7 },
+            { id: "LEC", name: "Charles Leclerc", team: "Ferrari", color: "#E8002D", speed: 4.75 },
+            { id: "NOR", name: "Lando Norris", team: "McLaren", color: "#FF8000", speed: 4.75 },
+            { id: "PIA", name: "Oscar Piastri", team: "McLaren", color: "#FF8000", speed: 4.65 },
+            { id: "RUS", name: "George Russell", team: "Mercedes", color: "#27F4D2", speed: 4.6 },
+            { id: "ANT", name: "Kimi Antonelli", team: "Mercedes", color: "#27F4D2", speed: 4.5 },
+            { id: "ALO", name: "Fernando Alonso", team: "Aston Martin", color: "#229971", speed: 4.4 },
+            { id: "STR", name: "Lance Stroll", team: "Aston Martin", color: "#229971", speed: 4.2 },
+            { id: "SAI", name: "Carlos Sainz", team: "Williams", color: "#005AFF", speed: 4.4 },
+            { id: "ALB", name: "Alex Albon", team: "Williams", color: "#005AFF", speed: 4.3 },
+            { id: "GAS", name: "Pierre Gasly", team: "Alpine", color: "#FF87BC", speed: 4.2 },
+            { id: "DOO", name: "Jack Doohan", team: "Alpine", color: "#FF87BC", speed: 4.1 },
+            { id: "TSU", name: "Yuki Tsunoda", team: "RB", color: "#6692FF", speed: 4.3 },
+            { id: "HAD", name: "Isack Hadjar", team: "RB", color: "#6692FF", speed: 4.1 },
+            { id: "HUL", name: "Nico Hulkenberg", team: "Sauber", color: "#00E701", speed: 4.2 },
+            { id: "BOR", name: "Gabriel Bortoleto", team: "Sauber", color: "#00E701", speed: 4.1 },
+            { id: "OCO", name: "Esteban Ocon", team: "Haas", color: "#FFFFFF", speed: 4.2 },
+            { id: "BEA", name: "Oliver Bearman", team: "Haas", color: "#FFFFFF", speed: 4.1 }
         ];
 
-        let cars = [];
-        let animationId;
+        // Scaled track shapes to fit perfectly inside the SVG Box
+        const trackLayouts = {
+            classic: "M 300 150 C 600 50, 900 200, 850 400 C 800 600, 600 650, 450 550 C 300 450, 200 600, 150 450 C 100 300, 50 150, 300 150 Z",
+            street: "M 200 200 L 800 200 L 800 500 L 600 500 L 600 350 L 400 350 L 400 500 L 200 500 Z",
+            speed: "M 250 350 Q 500 100 750 350 Q 850 500 500 550 Q 150 500 250 350 Z"
+        };
 
-        function initSchedule() {
+        let carsData = [];
+        let isRacing = false;
+        let animationId;
+        let frameCount = 0;
+        let finishCounter = 0;
+        let currentPathLength = 0;
+
+        // Initialize App
+        window.onload = () => {
             const list = document.getElementById('schedule-list');
-            schedule2026.forEach((race, index) => {
+            schedule2026.forEach(race => {
                 const el = document.createElement('div');
                 el.className = 'race-item';
                 el.innerHTML = `
@@ -224,101 +284,177 @@
                 el.onclick = () => loadTrack(race, el);
                 list.appendChild(el);
             });
-            
-            // Load first race by default
-            loadTrack(schedule2026[0], list.firstChild);
-        }
+            loadTrack(schedule2026[0], list.firstChild); // Load first race
+        };
 
         function loadTrack(race, element) {
-            // Update UI
+            // UI Update
             document.querySelectorAll('.race-item').forEach(el => el.classList.remove('active'));
             if(element) element.classList.add('active');
-            
             document.getElementById('current-track-name').innerText = race.name;
             document.getElementById('current-track-loc').innerText = race.loc;
 
-            // Change SVG Path
+            // Reset Race State
+            isRacing = false;
+            cancelAnimationFrame(animationId);
+            document.getElementById('sim-btn').disabled = false;
+            document.getElementById('sim-btn').innerText = "🏁 Simulate Race (3 Laps)";
+
+            // Update SVG Track Path
             const newPath = trackLayouts[race.layout];
-            document.getElementById('main-track').setAttribute('d', newPath);
-            document.getElementById('center-line').setAttribute('d', newPath);
+            const trackPath = document.getElementById('center-line');
+            trackPath.setAttribute('d', newPath);
+            document.getElementById('track-border').setAttribute('d', newPath);
+            currentPathLength = trackPath.getTotalLength();
 
             spawnCars();
+            updateLeaderboard();
+            animate(); // Start idle grid rendering
         }
 
         function spawnCars() {
-            const container = document.getElementById('cars-container');
-            container.innerHTML = '';
-            cars = [];
+            const layer = document.getElementById('cars-layer');
+            layer.innerHTML = ''; // Clear existing
+            
+            carsData = f1Drivers.map((driver, index) => {
+                // Create SVG Group for the car & its text label
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                
+                // Colored Circle
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("r", "7");
+                circle.setAttribute("fill", driver.color);
+                circle.setAttribute("stroke", "#fff");
+                circle.setAttribute("stroke-width", "1.5");
+                
+                // Driver Label
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.textContent = driver.id;
+                text.setAttribute("x", "0");
+                text.setAttribute("y", "-12");
+                text.setAttribute("fill", "#fff");
+                text.setAttribute("font-size", "12px");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("text-anchor", "middle");
+                text.style.textShadow = "1px 1px 3px rgba(0,0,0,0.8)";
 
-            const svg = document.getElementById('track-svg');
-            const path = document.getElementById('center-line');
-            const pathLength = path.getTotalLength();
+                g.appendChild(circle);
+                g.appendChild(text);
+                layer.appendChild(g);
 
-            teams.forEach((team, index) => {
-                const carEl = document.createElement('div');
-                carEl.className = 'car';
-                carEl.style.backgroundColor = team.color;
-                carEl.style.color = team.color; // for box-shadow
-                container.appendChild(carEl);
-
-                cars.push({
-                    el: carEl,
-                    distance: index * -50, // Stagger starting positions
-                    speed: team.speed + (Math.random() * 0.2), // Slight speed variance
-                    path: path,
-                    pathLength: pathLength,
-                    svg: svg
-                });
+                return {
+                    ...driver,
+                    element: g,
+                    distance: -index * 30, // Stagger them on the grid behind the start line
+                    lap: 0,
+                    finished: false,
+                    finishPosition: null
+                };
             });
-
-            if(!animationId) animateCars();
         }
 
-        function animateCars() {
-            cars.forEach(car => {
-                car.distance += car.speed;
-                
-                // Loop around the track
-                if (car.distance >= car.pathLength) {
-                    car.distance = 0;
+        function startRace() {
+            if (isRacing) return;
+            isRacing = true;
+            finishCounter = 0;
+            
+            const btn = document.getElementById('sim-btn');
+            btn.disabled = true;
+            btn.innerText = "🏎️ RACING...";
+
+            // Reset logic
+            carsData.forEach((car, index) => {
+                car.distance = -index * 30;
+                car.lap = 0;
+                car.finished = false;
+                car.finishPosition = null;
+            });
+        }
+
+        function animate() {
+            let allFinished = true;
+            const path = document.getElementById('center-line');
+
+            carsData.forEach(car => {
+                if (!car.finished && isRacing) {
+                    allFinished = false;
+                    // Add slight RNG variance to allow for overtakes
+                    let speedVariance = (Math.random() - 0.45) * 2.0; 
+                    car.distance += car.speed + speedVariance;
+                    
+                    let lapsCompleted = Math.floor(car.distance / currentPathLength);
+                    if (lapsCompleted >= 3) {
+                        car.finished = true;
+                        car.finishPosition = ++finishCounter;
+                    } else {
+                        car.lap = lapsCompleted;
+                    }
+                } else if (!car.finished && !isRacing) {
+                    allFinished = false; // Grid state
                 }
 
-                // If distance is negative (staggered start), keep them at start line temporarily
-                let renderDist = car.distance < 0 ? 0 : car.distance;
+                // Render math: This exactly pins the SVG dot to the path coordinates
+                let renderDist;
+                if (car.distance < 0) {
+                    // Wrap backward mathematically to line them up before the start line
+                    renderDist = currentPathLength + (car.distance % currentPathLength);
+                } else if (car.finished) {
+                    // Slow them down on a cool down lap once they cross the finish
+                    renderDist = car.distance % currentPathLength;
+                    car.distance += 1.0; 
+                } else {
+                    renderDist = car.distance % currentPathLength;
+                }
 
-                // Get SVG coordinates
-                const point = car.path.getPointAtLength(renderDist);
-                
-                // Convert SVG coordinates to screen coordinates
-                const svgRect = car.svg.getBoundingClientRect();
-                const viewBox = car.svg.viewBox.baseVal;
-                
-                const scaleX = svgRect.width / viewBox.width;
-                const scaleY = svgRect.height / viewBox.height;
-
-                const screenX = svgRect.left + (point.x * scaleX);
-                const screenY = svgRect.top + (point.y * scaleY);
-
-                car.el.style.left = `${screenX}px`;
-                car.el.style.top = `${screenY}px`;
+                const point = path.getPointAtLength(renderDist);
+                car.element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
             });
 
-            animationId = requestAnimationFrame(animateCars);
+            // Throttle UI Updates so we don't lag the browser
+            if (frameCount % 10 === 0 && isRacing) {
+                updateLeaderboard();
+            }
+            frameCount++;
+
+            if (allFinished && isRacing) {
+                isRacing = false;
+                document.getElementById('sim-btn').innerText = "🏁 RACE FINISHED";
+                updateLeaderboard(); // Final definitive order
+            }
+
+            animationId = requestAnimationFrame(animate);
         }
 
-        // Handle window resize to keep cars on track
-        window.addEventListener('resize', () => {
-            if(cars.length > 0) spawnCars();
-        });
+        function updateLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            
+            // Sort Array: Finished drivers lock at the top by position. Racing drivers ordered by distance.
+            let sortedCars = [...carsData].sort((a, b) => {
+                if (a.finished && b.finished) return a.finishPosition - b.finishPosition;
+                if (a.finished) return -1;
+                if (b.finished) return 1;
+                return b.distance - a.distance;
+            });
 
-        // Start
-        window.onload = initSchedule;
-    </script>
-</body>
-</html>
-
-        // Initialize board on load
-        window.onload = generateBaseBoard;
+            list.innerHTML = sortedCars.map((car, index) => {
+                let posText = car.finished ? `P${car.finishPosition}` : (index + 1);
+                let statusText = car.finished 
+                                    ? 'FINISH' 
+                                    : (car.distance < 0 ? 'GRID' : `L${car.lap + 1}/3`);
+                
+                return `
+                    <div class="lb-row">
+                        <div class="lb-pos">${posText}</div>
+                        <div class="lb-color" style="background-color: ${car.color};"></div>
+                        <div class="lb-name">
+                            <strong>${car.name}</strong><br>
+                            <span style="font-size: 0.75rem; color: #888;">${car.team}</span>
+                        </div>
+                        <div class="lb-status">${statusText}</div>
+                    </div>
+                `;
+            }).join('');
+        }
     </script>
 </body>
 </html>
